@@ -47,6 +47,11 @@ if ( ! function_exists( 'rotous18_setup' ) ) :
 			'menu-1' => esc_html__( 'Primary', 'rotous18' ),
 		) );
 
+		// This theme uses wp_nav_menu() in one location.
+		register_nav_menus( array(
+			'menu-2' => esc_html__( 'Footer', 'rotous18' ),
+		) );
+
 		/*
 		 * Switch default core markup for search form, comment form, and comments
 		 * to output valid HTML5.
@@ -164,4 +169,49 @@ if ( defined( 'JETPACK__VERSION' ) ) {
  */
 if ( class_exists( 'WooCommerce' ) ) {
 	require get_template_directory() . '/inc/woocommerce.php';
+}
+
+
+/******************************
+ * CUSTOM FUNCTIONS
+ ******************************/
+$rtcolors = array('green', 'yellow', 'orange', 'red', 'purple', 'marine', 'blue', 'black', 'grey');
+/**
+ * Returns one of the predefined colors for a given string
+ */
+function get_string_color($s) {
+	global $rtcolors;
+	return $rtcolors[intval(substr(md5($s), 0, 4), 16) % 7]; // No black or grey
+}
+
+/**
+ * Returns the html for the tag list
+ */
+function get_tag_labels() {
+	$tags = get_the_tag_list('', ',');
+	if ( !$tags && is_wp_error($tags) || empty($tags) ) {
+		return '';
+	}
+
+	$tags = explode(',', $tags);
+	foreach ($tags as $i => $tag) {
+		$tags[$i] = '<li class="rt-bg-' . get_string_color($tag) . ' rt-label">' . $tag . '</li>';
+	}
+	return '<ul class="rt-tag-labels">' . implode('', $tags) . '</ul>';
+}
+
+/**
+ * Returns the html for the category list
+ */
+function get_category_labels() {
+	$categories = get_the_category_list(',');
+	if ( !$categories && is_wp_error($categories) || empty($categories) ) {
+		return '';
+	}
+
+	$categories = explode(',', $categories);
+	foreach ($categories as $i => $category) {
+		$categories[$i] = '<li class="rt-bg-' . get_string_color($category) . ' rt-label">' . $category . '</li>';
+	}
+	return '<ul class="rt-category-labels">' . implode('', $categories) . '</ul>';
 }
